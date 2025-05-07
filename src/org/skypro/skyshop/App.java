@@ -1,31 +1,33 @@
 package org.skypro.skyshop;
 
-import org.skypro.skyshop.product.Product;
+import org.skypro.skyshop.product.DiscountedProduct;
+import org.skypro.skyshop.product.FixPriceProduct;
+import org.skypro.skyshop.product.SimpleProduct;
 import org.skypro.skyshop.productbasket.ProductBasket;
 
 public class App {
 
     public static void main(String[] args) {
 
-        Product product1 = new Product("Молоко", 80);
-        Product product2 = new Product("Хлеб", 70);
-        Product product3 = new Product("Колбаса", 180);
-        Product product4 = new Product("Сахар", 60);
-        Product product5 = new Product("Соль", 50);
-        Product product6 = new Product("Чай", 120);
+        SimpleProduct simpleProduct1 = new SimpleProduct("Молоко", 80);
+        SimpleProduct simpleProduct2 = new SimpleProduct("Хлеб", 70);
+        DiscountedProduct discountedProduct1 = new DiscountedProduct("Колбаса", 180, 10);
+        DiscountedProduct discountedProduct2 = new DiscountedProduct("Сахар", 60, 10);
+        FixPriceProduct fixPriceProduct = new FixPriceProduct("Кофе");
+        SimpleProduct simpleProduct6 = new SimpleProduct("Чай", 120);
 
         ProductBasket basket = new ProductBasket(5);
         System.out.println("=== Создана пустая корзина ===");
 
         System.out.println("\n=== Заполняем корзину ===");
-        basket.addProduct(product1);
-        basket.addProduct(product2);
-        basket.addProduct(product3);
-        basket.addProduct(product4);
-        basket.addProduct(product5);
+        basket.addProduct(simpleProduct1);
+        basket.addProduct(simpleProduct2);
+        basket.addProduct(discountedProduct1);
+        basket.addProduct(discountedProduct2);
+        basket.addProduct(fixPriceProduct);
 
         System.out.println("\n=== Добавляем продукт в заполненную корзину ===");
-        basket.addProduct(product6);
+        basket.addProduct(simpleProduct6);
 
         System.out.println("\n=== Содержимое корзины ===");
         basket.printBasket();
