@@ -24,4 +24,19 @@ public class DiscountedProduct extends Product {
     public String getDisplayInfo() {
         return getProductName() + ": " + getProductCost() + " руб. (" + discountPercent + "%)";
     }
+
+    @Override
+    public String getSearchTerm() {
+        return getStringRepresentation();
+    }
+
+    @Override
+    public String getSearchableObjectType() {
+        return "";
+    }
+
+    @Override
+    public String getSearchableObjectName() {
+        return "";
+    }
 }

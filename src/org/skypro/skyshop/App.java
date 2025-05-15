@@ -1,13 +1,33 @@
 package org.skypro.skyshop;
 
+import org.skypro.skyshop.article.Article;
+import org.skypro.skyshop.article.SearchEngine;
 import org.skypro.skyshop.product.DiscountedProduct;
 import org.skypro.skyshop.product.FixPriceProduct;
 import org.skypro.skyshop.product.SimpleProduct;
 import org.skypro.skyshop.productbasket.ProductBasket;
 
+
 public class App {
 
     public static void main(String[] args) {
+
+        SearchEngine engine = new SearchEngine(10);
+
+        engine.addSearchable(new SimpleProduct("Молоко", 80));
+        engine.addSearchable(new SimpleProduct("Хлеб", 70));
+        engine.addSearchable(new DiscountedProduct("Колбаса", 180, 10));
+        engine.addSearchable(new DiscountedProduct("Сахар", 60, 10));
+        engine.addSearchable(new FixPriceProduct("Кофе"));
+        engine.addSearchable(new SimpleProduct("Чай", 120));
+
+        engine.addSearchable(new Article("Кому полезно молоко", "Существует много мнений о пользе или вреде молочных продуктов..."));
+        engine.addSearchable(new Article("Как выбрать чай", "Чай бывает разных сортов (черный, зеленый, красный..."));
+
+        engine.search("молоко");
+        engine.search("сахар");
+        engine.search("чай");
+        engine.search("шоколад");
 
         SimpleProduct simpleProduct1 = new SimpleProduct("Молоко", 80);
         SimpleProduct simpleProduct2 = new SimpleProduct("Хлеб", 70);
@@ -17,7 +37,7 @@ public class App {
         SimpleProduct simpleProduct6 = new SimpleProduct("Чай", 120);
 
         ProductBasket basket = new ProductBasket(5);
-        System.out.println("=== Создана пустая корзина ===");
+        System.out.println("\n=== Создана пустая корзина ===");
 
         System.out.println("\n=== Заполняем корзину ===");
         basket.addProduct(simpleProduct1);

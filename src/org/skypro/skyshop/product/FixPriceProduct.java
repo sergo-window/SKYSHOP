@@ -21,4 +21,19 @@ public class FixPriceProduct extends Product {
     public String getDisplayInfo() {
         return getProductName() + ": Фиксированная цена " + FIX_PRICE + " руб.";
     }
+
+    @Override
+    public String getSearchTerm() {
+        return getStringRepresentation();
+    }
+
+    @Override
+    public String getSearchableObjectType() {
+        return "";
+    }
+
+    @Override
+    public String getSearchableObjectName() {
+        return "";
+    }
 }

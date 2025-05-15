@@ -21,4 +21,19 @@ public class SimpleProduct extends Product {
     public String getDisplayInfo() {
         return getProductName() + ": " + getProductCost() + " руб.";
     }
+
+    @Override
+    public String getSearchTerm() {
+        return getStringRepresentation();
+    }
+
+    @Override
+    public String getSearchableObjectType() {
+        return "";
+    }
+
+    @Override
+    public String getSearchableObjectName() {
+        return "";
+    }
 }
