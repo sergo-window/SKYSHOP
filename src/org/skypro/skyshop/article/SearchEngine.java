@@ -1,8 +1,5 @@
 package org.skypro.skyshop.article;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class SearchEngine {
     private final Searchable[] searchables;
     private int count;
@@ -25,36 +22,50 @@ public class SearchEngine {
         }
     }
 
-    public void search(String query) {
+    public Searchable[] search(String query) {
         if (query == null || query.trim().isEmpty()) {
             System.out.println("Поисковый запрос не может быть пустым");
-            return;
+            return new Searchable[0];
         }
 
-        List<Searchable> results = new ArrayList<>();
+        Searchable[] results = new Searchable[5];
+        int foundCount = 0;
         String lowerQuery = query.toLowerCase();
 
-        for (int i = 0; i < count; i++) {
+        for (int i = 0; i < count && foundCount < 5; i++) {
             Searchable searchable = searchables[i];
             if (searchable.getSearchTerm().toLowerCase().contains(lowerQuery)) {
-                results.add(searchables[i]);
-                if (results.size() >= 5) {
-                    break;
-                }
+                results[foundCount] = searchable;
+                foundCount++;
             }
         }
 
-        if (results.isEmpty()) {
-            System.out.println("\nНичего не найдено по запросу: '" + query + "'");
+        printSearchResults(query, results, foundCount);
+        return trimResultsArray(results, foundCount);
+    }
+
+    private void printSearchResults(String query, Searchable[] results, int foundCount) {
+        if (foundCount == 0) {
+            System.out.println("Ничего не найдено по запросу: '" + query + "'");
             return;
         }
 
         System.out.println("\nРезультаты поиска ('" + query + "'):");
         System.out.println("----------------------------------");
-        for (Searchable result : results) {
-            System.out.println(result.getStringRepresentation());
+        for (int i = 0; i < foundCount; i++) {
+            System.out.println(results[i].getStringRepresentation());
         }
         System.out.println("----------------------------------");
-        System.out.println("Найдено: " + results.size() + " из " + count);
+        System.out.println("Найдено: " + foundCount + " из " + count);
+    }
+
+    private Searchable[] trimResultsArray(Searchable[] results, int actualSize) {
+        if (actualSize == results.length) {
+            return results;
+        }
+
+        Searchable[] trimmedArray = new Searchable[actualSize];
+        System.arraycopy(results, 0, trimmedArray, 0, actualSize);
+        return trimmedArray;
     }
 }

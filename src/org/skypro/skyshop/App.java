@@ -23,7 +23,9 @@ public class App {
 
         engine.addSearchable(new Article("Кому полезно молоко", "Существует много мнений о пользе или вреде молочных продуктов..."));
         engine.addSearchable(new Article("Как выбрать чай", "Чай бывает разных сортов (черный, зеленый, красный..."));
+        engine.addSearchable(new Article("Из чего делают сахар", "Для изготовления сахара применяются различные технологии..."));
 
+        engine.search("молоко");
         engine.search("молоко");
         engine.search("сахар");
         engine.search("чай");
