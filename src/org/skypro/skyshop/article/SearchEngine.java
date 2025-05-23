@@ -46,7 +46,7 @@ public class SearchEngine {
 
     private void printSearchResults(String query, Searchable[] results, int foundCount) {
         if (foundCount == 0) {
-            System.out.println("Ничего не найдено по запросу: '" + query + "'");
+            System.out.println("\nНичего не найдено по запросу: '" + query + "'");
             return;
         }
 
@@ -67,5 +67,48 @@ public class SearchEngine {
         Searchable[] trimmedArray = new Searchable[actualSize];
         System.arraycopy(results, 0, trimmedArray, 0, actualSize);
         return trimmedArray;
+    }
+
+    public Searchable findBestMatch(String query) throws BestResultNotFound {
+        if (query == null || query.trim().isEmpty()) {
+            throw new BestResultNotFound("Пустой поисковый запрос");
+        }
+
+        Searchable bestMatch = null;
+        String lowerQuery = query.toLowerCase();
+        int bestScore = -1;
+
+        for (int i = 0; i < count; i++) {
+            Searchable searchable = searchables[i];
+            int currentScore = calculateMatchScore(searchable, lowerQuery);
+
+            if (currentScore > bestScore) {
+                bestScore = currentScore;
+                bestMatch = searchable;
+            }
+        }
+
+        if (bestMatch == null) {
+            throw new BestResultNotFound(query);
+        }
+
+        System.out.println("\nНайден лучший результат по запросу '" + query + "':");
+        System.out.println(bestMatch.getStringRepresentation());
+
+        return bestMatch;
+    }
+
+    private int calculateMatchScore(Searchable searchable, String lowerQuery) {
+        String searchTerm = searchable.getSearchTerm().toLowerCase();
+        if (searchTerm.equals(lowerQuery)) {
+            return 100;
+        }
+        if (searchTerm.startsWith(lowerQuery)) {
+            return 50;
+        }
+        if (searchTerm.contains(lowerQuery)) {
+            return 30;
+        }
+        return 0;
     }
 }
