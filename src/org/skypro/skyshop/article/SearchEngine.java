@@ -1,12 +1,13 @@
 package org.skypro.skyshop.article;
 
-public class SearchEngine {
-    private final Searchable[] searchables;
-    private int count;
+import java.util.LinkedList;
+import java.util.List;
 
-    public SearchEngine(int capacity) {
-        this.searchables = new Searchable[capacity];
-        this.count = 0;
+public class SearchEngine {
+    private final LinkedList<Searchable> searchables;
+
+    public SearchEngine() {
+        this.searchables = new LinkedList<>();
     }
 
     public void addSearchable(Searchable searchable) {
@@ -14,12 +15,7 @@ public class SearchEngine {
             System.out.println("Ошибка: попытка добавить null");
             return;
         }
-        if (count < searchables.length) {
-            searchables[count] = searchable;
-            count++;
-        } else {
-            System.out.println("Достигнут максимум поисковых объектов!");
-        }
+        searchables.add(searchable);
     }
 
     public Searchable[] search(String query) {
@@ -28,45 +24,34 @@ public class SearchEngine {
             return new Searchable[0];
         }
 
-        Searchable[] results = new Searchable[5];
-        int foundCount = 0;
+        List<Searchable> results = new LinkedList<>();
         String lowerQuery = query.toLowerCase();
 
-        for (int i = 0; i < count && foundCount < 5; i++) {
-            Searchable searchable = searchables[i];
+        for (Searchable searchable : searchables) {
             if (searchable.getSearchTerm().toLowerCase().contains(lowerQuery)) {
-                results[foundCount] = searchable;
-                foundCount++;
+                results.add(searchable);
+                if (results.size() >= 5) {
+                    break;
+                }
             }
         }
 
-        printSearchResults(query, results, foundCount);
-        return trimResultsArray(results, foundCount);
+        printSearchResults(query, results);
+        return results.toArray(new Searchable[0]);
     }
 
-    private void printSearchResults(String query, Searchable[] results, int foundCount) {
-        if (foundCount == 0) {
+    private void printSearchResults(String query, List<Searchable> results) {
+        if (results.isEmpty()) {
             System.out.println("\nНичего не найдено по запросу: '" + query + "'");
             return;
         }
 
         System.out.println("\nРезультаты поиска ('" + query + "'):");
         System.out.println("----------------------------------");
-        for (int i = 0; i < foundCount; i++) {
-            System.out.println(results[i].getStringRepresentation());
-        }
+        results.forEach(result ->
+                System.out.println(result.getStringRepresentation()));
         System.out.println("----------------------------------");
-        System.out.println("Найдено: " + foundCount + " из " + count);
-    }
-
-    private Searchable[] trimResultsArray(Searchable[] results, int actualSize) {
-        if (actualSize == results.length) {
-            return results;
-        }
-
-        Searchable[] trimmedArray = new Searchable[actualSize];
-        System.arraycopy(results, 0, trimmedArray, 0, actualSize);
-        return trimmedArray;
+        System.out.println("Найдено: " + results.size() + " из " + searchables.size());
     }
 
     public Searchable findBestMatch(String query) throws BestResultNotFound {
@@ -78,10 +63,8 @@ public class SearchEngine {
         String lowerQuery = query.toLowerCase();
         int bestScore = -1;
 
-        for (int i = 0; i < count; i++) {
-            Searchable searchable = searchables[i];
+        for (Searchable searchable : searchables) {
             int currentScore = calculateMatchScore(searchable, lowerQuery);
-
             if (currentScore > bestScore) {
                 bestScore = currentScore;
                 bestMatch = searchable;
@@ -94,21 +77,14 @@ public class SearchEngine {
 
         System.out.println("\nНайден лучший результат по запросу '" + query + "':");
         System.out.println(bestMatch.getStringRepresentation());
-
         return bestMatch;
     }
 
     private int calculateMatchScore(Searchable searchable, String lowerQuery) {
         String searchTerm = searchable.getSearchTerm().toLowerCase();
-        if (searchTerm.equals(lowerQuery)) {
-            return 100;
-        }
-        if (searchTerm.startsWith(lowerQuery)) {
-            return 50;
-        }
-        if (searchTerm.contains(lowerQuery)) {
-            return 30;
-        }
+        if (searchTerm.equals(lowerQuery)) return 100;
+        if (searchTerm.startsWith(lowerQuery)) return 50;
+        if (searchTerm.contains(lowerQuery)) return 30;
         return 0;
     }
 }
