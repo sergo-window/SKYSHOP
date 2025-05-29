@@ -6,15 +6,18 @@ import org.skypro.skyshop.article.SearchEngine;
 import org.skypro.skyshop.article.Searchable;
 import org.skypro.skyshop.product.DiscountedProduct;
 import org.skypro.skyshop.product.FixPriceProduct;
+import org.skypro.skyshop.product.Product;
 import org.skypro.skyshop.product.SimpleProduct;
 import org.skypro.skyshop.productbasket.ProductBasket;
+
+import java.util.LinkedList;
 
 
 public class App {
 
     public static void main(String[] args) {
 
-        SearchEngine engine = new SearchEngine(10);
+        SearchEngine engine = new SearchEngine();
 
         try {
 
@@ -24,55 +27,65 @@ public class App {
             engine.addSearchable(new DiscountedProduct("Сахар", 60, 10));
             engine.addSearchable(new FixPriceProduct("Кофе"));
             engine.addSearchable(new SimpleProduct("Чай", 120));
+            engine.addSearchable(new Article("Польза молока", "Молоко содержит кальций..."));
 
         } catch (IllegalArgumentException e) {
             System.out.println(e.getMessage());
-        } finally {
-            System.out.println("\nПроверка завершена");
         }
 
         engine.addSearchable(new Article("Кому полезно молоко", "Существует много мнений о пользе или вреде молочных продуктов..."));
         engine.addSearchable(new Article("Как выбрать чай", "Чай бывает разных сортов (черный, зеленый, красный..."));
         engine.addSearchable(new Article("Из чего делают сахар", "Для изготовления сахара применяются различные технологии..."));
 
-        engine.search("спирт");
+        engine.search("молоко");
         engine.search("сахар");
         engine.search("чай");
         engine.search("шоколад");
 
         try {
 
-            Searchable bestMatch = engine.findBestMatch("много");
+            Searchable bestMatch = engine.findBestMatch("польза");
             System.out.println("\nЛучший результат: " + bestMatch.getSearchableObjectName());
-
-            engine.findBestMatch("  ");
 
         } catch (BestResultNotFound e) {
             System.out.println("\nОШИБКА! " + e.getMessage());
         }
 
-        SimpleProduct simpleProduct1 = new SimpleProduct("Молоко", 80);
-        SimpleProduct simpleProduct2 = new SimpleProduct("Хлеб", 70);
-        DiscountedProduct discountedProduct1 = new DiscountedProduct("Колбаса", 180, 10);
-        DiscountedProduct discountedProduct2 = new DiscountedProduct("Сахар", 60, 10);
-        FixPriceProduct fixPriceProduct = new FixPriceProduct("Кофе");
-        SimpleProduct simpleProduct6 = new SimpleProduct("Чай", 120);
+        ProductBasket basket = new ProductBasket();
 
-        ProductBasket basket = new ProductBasket(5);
         System.out.println("\n=== Создана пустая корзина ===");
 
         System.out.println("\n=== Заполняем корзину ===");
 
-        basket.addProduct(simpleProduct1);
-        basket.addProduct(simpleProduct2);
-        basket.addProduct(discountedProduct1);
-        basket.addProduct(discountedProduct2);
-        basket.addProduct(fixPriceProduct);
+        basket.addProduct(new SimpleProduct("Молоко", 80));
+        basket.addProduct(new SimpleProduct("Хлеб", 70));
+        basket.addProduct(new DiscountedProduct("Колбаса", 180, 10));
+        basket.addProduct(new DiscountedProduct("Сахар", 60, 10));
+        basket.addProduct(new FixPriceProduct("Кофе"));
+        basket.addProduct(new SimpleProduct("Молоко", 90));
 
-        System.out.println("\n=== Добавляем продукт в заполненную корзину ===");
-        basket.addProduct(simpleProduct6);
+        basket.printBasket();
 
-        System.out.println("\n=== Содержимое корзины ===");
+        System.out.println("\n=== Удаляем продукт 'Молоко' ===");
+        LinkedList<Product> removed = basket.removeProduct("Молоко");
+
+        System.out.println("\nУдаленные продукты:");
+        if (!removed.isEmpty()) {
+            removed.forEach(product ->
+                    System.out.println(product.getProductName() + " - " + product.getProductCost() + " руб."));
+        }
+
+        System.out.println("\nСодержимое корзины после удаления:");
+        basket.printBasket();
+
+        System.out.println("\n=== Пытаемся удалить несуществующий продукт 'Шоколад' ===");
+        LinkedList<Product> notFound = basket.removeProduct("Шоколад");
+
+        if (notFound.isEmpty()) {
+            System.out.println("\nСписок удаленных продуктов пуст (продукт не найден)");
+        }
+
+        System.out.println("\nСодержимое корзины после попытки удаления несуществующего продукта:");
         basket.printBasket();
 
         System.out.println("\n=== Поиск существующего товара ===");
