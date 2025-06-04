@@ -1,7 +1,6 @@
 package org.skypro.skyshop.article;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 public class SearchEngine {
     private final LinkedList<Searchable> searchables;
@@ -18,29 +17,28 @@ public class SearchEngine {
         searchables.add(searchable);
     }
 
-    public Searchable[] search(String query) {
+    public TreeMap<String, Searchable> search(String query) {
         if (query == null || query.trim().isEmpty()) {
             System.out.println("Поисковый запрос не может быть пустым");
-            return new Searchable[0];
+            return new TreeMap<>();
         }
 
-        List<Searchable> results = new LinkedList<>();
+        TreeMap<String, Searchable> results = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
         String lowerQuery = query.toLowerCase();
-
-        for (Searchable searchable : searchables) {
-            if (searchable.getSearchTerm().toLowerCase().contains(lowerQuery)) {
-                results.add(searchable);
-                if (results.size() >= 5) {
-                    break;
-                }
+        int count = 0;
+        for (Searchable s : searchables) {
+            if (s.getSearchTerm().toLowerCase().contains(lowerQuery)) {
+                results.put(s.getSearchableObjectName(), s);
+                count++;
+                if (count >= 5) break;
             }
         }
 
         printSearchResults(query, results);
-        return results.toArray(new Searchable[0]);
+        return results;
     }
 
-    private void printSearchResults(String query, List<Searchable> results) {
+    private void printSearchResults(String query, Map<String, Searchable> results) {
         if (results.isEmpty()) {
             System.out.println("\nНичего не найдено по запросу: '" + query + "'");
             return;
@@ -48,8 +46,8 @@ public class SearchEngine {
 
         System.out.println("\nРезультаты поиска ('" + query + "'):");
         System.out.println("----------------------------------");
-        results.forEach(result ->
-                System.out.println(result.getStringRepresentation()));
+        results.forEach((name, searchable) ->
+                System.out.println(searchable.getStringRepresentation()));
         System.out.println("----------------------------------");
         System.out.println("Найдено: " + results.size() + " из " + searchables.size());
     }
