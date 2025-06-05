@@ -10,7 +10,8 @@ import org.skypro.skyshop.product.Product;
 import org.skypro.skyshop.product.SimpleProduct;
 import org.skypro.skyshop.productbasket.ProductBasket;
 
-import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 
 public class App {
@@ -42,6 +43,21 @@ public class App {
         engine.search("чай");
         engine.search("шоколад");
 
+        Map<String, Searchable> results = engine.search("молоко");
+
+        System.out.println("\nДетализация результатов:");
+        results.forEach((name, obj) -> {
+            System.out.println("Ключ: " + name);
+            System.out.println("Тип: " + obj.getSearchableObjectType());
+        });
+
+        System.out.println("\nТолько продукты:");
+        for (Searchable s : results.values()) {
+            if (s.getSearchableObjectType().equals("PRODUCT")) {
+                System.out.println(s);
+            }
+        }
+
         try {
 
             Searchable bestMatch = engine.findBestMatch("польза");
@@ -67,7 +83,7 @@ public class App {
         basket.printBasket();
 
         System.out.println("\n=== Удаляем продукт 'Молоко' ===");
-        LinkedList<Product> removed = basket.removeProduct("Молоко");
+        List<Product> removed = basket.removeProduct("Молоко");
 
         System.out.println("\nУдаленные продукты:");
         if (!removed.isEmpty()) {
@@ -79,7 +95,7 @@ public class App {
         basket.printBasket();
 
         System.out.println("\n=== Пытаемся удалить несуществующий продукт 'Шоколад' ===");
-        LinkedList<Product> notFound = basket.removeProduct("Шоколад");
+        List<Product> notFound = basket.removeProduct("Шоколад");
 
         if (notFound.isEmpty()) {
             System.out.println("\nСписок удаленных продуктов пуст (продукт не найден)");
