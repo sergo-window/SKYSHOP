@@ -11,7 +11,7 @@ import org.skypro.skyshop.product.SimpleProduct;
 import org.skypro.skyshop.productbasket.ProductBasket;
 
 import java.util.List;
-import java.util.TreeMap;
+import java.util.Map;
 
 
 public class App {
@@ -43,7 +43,7 @@ public class App {
         engine.search("чай");
         engine.search("шоколад");
 
-        TreeMap<String, Searchable> results = engine.search("молоко");
+        Map<String, Searchable> results = engine.search("молоко");
 
         System.out.println("\nДетализация результатов:");
         results.forEach((name, obj) -> {

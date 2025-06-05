@@ -17,7 +17,7 @@ public class SearchEngine {
         searchables.add(searchable);
     }
 
-    public TreeMap<String, Searchable> search(String query) {
+    public Map<String, Searchable> search(String query) {
         if (query == null || query.trim().isEmpty()) {
             System.out.println("Поисковый запрос не может быть пустым");
             return new TreeMap<>();

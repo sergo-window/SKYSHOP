@@ -6,7 +6,7 @@ import java.util.*;
 
 
 public class ProductBasket {
-    private final TreeMap<String, LinkedList<Product>> productsMap;
+    private final Map<String, LinkedList<Product>> productsMap;
 
     public ProductBasket() {
         this.productsMap = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
