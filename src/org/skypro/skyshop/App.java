@@ -11,7 +11,7 @@ import org.skypro.skyshop.product.SimpleProduct;
 import org.skypro.skyshop.productbasket.ProductBasket;
 
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 
 
 public class App {
@@ -37,26 +37,45 @@ public class App {
         engine.addSearchable(new Article("Кому полезно молоко", "Существует много мнений о пользе или вреде молочных продуктов..."));
         engine.addSearchable(new Article("Как выбрать чай", "Чай бывает разных сортов (черный, зеленый, красный..."));
         engine.addSearchable(new Article("Из чего делают сахар", "Для изготовления сахара применяются различные технологии..."));
+        engine.addSearchable(new Article("Из чего делают сахар", "Для изготовления сахара применяются различные технологии..."));
 
-        engine.search("молоко");
-        engine.search("сахар");
-        engine.search("чай");
-        engine.search("шоколад");
+        Set<Searchable> milkResults = engine.search("молоко");
+        Set<Searchable> sugarResults = engine.search("сахар");
+        Set<Searchable> teaResults = engine.search("чай");
+        Set<Searchable> chocolateResults = engine.search("шоколад");
 
-        Map<String, Searchable> results = engine.search("молоко");
-
-        System.out.println("\nДетализация результатов:");
-        results.forEach((name, obj) -> {
-            System.out.println("Ключ: " + name);
+        System.out.println("\nДетализация результатов по запросу 'молоко':");
+        milkResults.forEach(obj -> {
+            System.out.println("Имя: " + obj.getSearchableObjectName());
             System.out.println("Тип: " + obj.getSearchableObjectType());
+            System.out.println("---");
+        });
+
+        System.out.println("\nДетализация результатов по запросу 'сахар':");
+        sugarResults.forEach(obj -> {
+            System.out.println("Имя: " + obj.getSearchableObjectName());
+            System.out.println("Тип: " + obj.getSearchableObjectType());
+            System.out.println("---");
+        });
+
+        System.out.println("\nДетализация результатов по запросу 'чай':");
+        teaResults.forEach(obj -> {
+            System.out.println("Имя: " + obj.getSearchableObjectName());
+            System.out.println("Тип: " + obj.getSearchableObjectType());
+            System.out.println("---");
+        });
+
+        System.out.println("\nДетализация результатов по запросу 'шоколад':");
+        chocolateResults.forEach(obj -> {
+            System.out.println("Имя: " + obj.getSearchableObjectName());
+            System.out.println("Тип: " + obj.getSearchableObjectType());
+            System.out.println("---");
         });
 
         System.out.println("\nТолько продукты:");
-        for (Searchable s : results.values()) {
-            if (s.getSearchableObjectType().equals("PRODUCT")) {
-                System.out.println(s);
-            }
-        }
+        milkResults.stream()
+                .filter(s -> s.getSearchableObjectType().equals("PRODUCT"))
+                .forEach(System.out::println);
 
         try {
 

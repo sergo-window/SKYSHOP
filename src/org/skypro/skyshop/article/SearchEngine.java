@@ -3,10 +3,24 @@ package org.skypro.skyshop.article;
 import java.util.*;
 
 public class SearchEngine {
-    private final LinkedList<Searchable> searchables;
+    private final Set<Searchable> searchables;
 
     public SearchEngine() {
-        this.searchables = new LinkedList<>();
+        this.searchables = new HashSet<>();
+    }
+
+    private static class SearchableComparator implements Comparator<Searchable> {
+        @Override
+        public int compare(Searchable o1, Searchable o2) {
+            int lengthCompare = Integer.compare(
+                    o2.getSearchableObjectName().length(),
+                    o1.getSearchableObjectName().length()
+            );
+            if (lengthCompare == 0) {
+                return o1.getSearchableObjectName().compareTo(o2.getSearchableObjectName());
+            }
+            return lengthCompare;
+        }
     }
 
     public void addSearchable(Searchable searchable) {
@@ -14,31 +28,29 @@ public class SearchEngine {
             System.out.println("Ошибка: попытка добавить null");
             return;
         }
-        searchables.add(searchable);
+        if (!searchables.add(searchable)) {
+            System.out.println("\nОбъект '" + searchable.getSearchableObjectName() + "' уже существует");
+        }
     }
 
-    public Map<String, Searchable> search(String query) {
+    public TreeSet<Searchable> search(String query) {
         if (query == null || query.trim().isEmpty()) {
             System.out.println("Поисковый запрос не может быть пустым");
-            return new TreeMap<>();
+            return new TreeSet<>(new SearchableComparator());
         }
 
-        TreeMap<String, Searchable> results = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+        TreeSet<Searchable> results = new TreeSet<>(new SearchableComparator());
         String lowerQuery = query.toLowerCase();
-        int count = 0;
-        for (Searchable s : searchables) {
-            if (s.getSearchTerm().toLowerCase().contains(lowerQuery)) {
-                results.put(s.getSearchableObjectName(), s);
-                count++;
-                if (count >= 5) break;
-            }
-        }
+        searchables.stream()
+                .filter(s -> s.getSearchTerm().toLowerCase().contains(lowerQuery))
+                .limit(5)
+                .forEach(results::add);
 
         printSearchResults(query, results);
         return results;
     }
 
-    private void printSearchResults(String query, Map<String, Searchable> results) {
+    private void printSearchResults(String query, Set<Searchable> results) {
         if (results.isEmpty()) {
             System.out.println("\nНичего не найдено по запросу: '" + query + "'");
             return;
@@ -46,7 +58,7 @@ public class SearchEngine {
 
         System.out.println("\nРезультаты поиска ('" + query + "'):");
         System.out.println("----------------------------------");
-        results.forEach((name, searchable) ->
+        results.forEach(searchable ->
                 System.out.println(searchable.getStringRepresentation()));
         System.out.println("----------------------------------");
         System.out.println("Найдено: " + results.size() + " из " + searchables.size());
@@ -57,25 +69,14 @@ public class SearchEngine {
             throw new BestResultNotFound("Пустой поисковый запрос");
         }
 
-        Searchable bestMatch = null;
-        String lowerQuery = query.toLowerCase();
-        int bestScore = -1;
-
-        for (Searchable searchable : searchables) {
-            int currentScore = calculateMatchScore(searchable, lowerQuery);
-            if (currentScore > bestScore) {
-                bestScore = currentScore;
-                bestMatch = searchable;
-            }
-        }
-
-        if (bestMatch == null) {
-            throw new BestResultNotFound(query);
-        }
-
-        System.out.println("\nНайден лучший результат по запросу '" + query + "':");
-        System.out.println(bestMatch.getStringRepresentation());
-        return bestMatch;
+        return search(query).stream()
+                .max((s1, s2) -> {
+                    String lowerQuery = query.toLowerCase();
+                    int score1 = calculateMatchScore(s1, lowerQuery);
+                    int score2 = calculateMatchScore(s2, lowerQuery);
+                    return Integer.compare(score1, score2);
+                })
+                .orElseThrow(() -> new BestResultNotFound(query));
     }
 
     private int calculateMatchScore(Searchable searchable, String lowerQuery) {
