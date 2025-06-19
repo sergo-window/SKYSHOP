@@ -4,6 +4,7 @@ import org.skypro.skyshop.product.Product;
 
 import java.util.*;
 
+import java.util.stream.IntStream;
 
 public class ProductBasket {
     private final Map<String, LinkedList<Product>> productsMap;
@@ -26,32 +27,33 @@ public class ProductBasket {
             return;
         }
 
-        int specialCount = 0;
-        int totalItems = 0;
-
-        for (List<Product> products : productsMap.values()) {
-            for (Product product : products) {
-                System.out.println(product.getDisplayInfo());
-                if (product.isSpecial()) {
-                    specialCount++;
-                }
-                totalItems++;
-            }
-        }
+        productsMap.values().stream()
+                .flatMap(List::stream)
+                .forEach(product -> System.out.println(product.getDisplayInfo()));
 
         System.out.println("ИТОГО: " + getTotalCost() + " руб.");
-        System.out.println("Специальных товаров: " + specialCount);
-        System.out.println("Всего товаров: " + totalItems);
+        System.out.println("Специальных товаров: " + getSpecialCount());
+        System.out.println("Всего товаров: " + getTotalItemCount());
     }
 
     public int getTotalCost() {
-        int total = 0;
-        for (List<Product> products : productsMap.values()) {
-            for (Product product : products) {
-                total += product.getProductCost();
-            }
-        }
-        return total;
+        return productsMap.values().stream()
+                .flatMap(List::stream)
+                .mapToInt(Product::getProductCost)
+                .sum();
+    }
+
+    private long getSpecialCount() {
+        return productsMap.values().stream()
+                .flatMap(List::stream)
+                .filter(Product::isSpecial)
+                .count();
+    }
+
+    private long getTotalItemCount() {
+        return productsMap.values().stream()
+                .mapToLong(List::size)
+                .sum();
     }
 
     public void searchAndPrintProduct(String productName) {
@@ -62,13 +64,13 @@ public class ProductBasket {
         }
 
         System.out.println("Найдены продукты '" + productName + "':");
-        int position = 1;
-        for (Product product : products) {
-            System.out.printf("%d. %s - %d руб.%n",
-                    position++,
-                    product.getDisplayInfo(),
-                    product.getProductCost());
-        }
+
+
+        IntStream.range(0, products.size())
+                .forEach(i -> System.out.printf("%d. %s - %d руб.%n",
+                        i + 1,
+                        products.get(i).getDisplayInfo(),
+                        products.get(i).getProductCost()));
     }
 
     public void clearBasket() {
